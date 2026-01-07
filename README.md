@@ -1,6 +1,6 @@
 # evacuation-simulation-system
 
-An Electron application with React and TypeScript
+Arus Evac (tentative) is an evacuation planning tool that evaluates plans by simulating scenarios ranging from villages to cities. It models the full timeline of events, from initial evacuation and shelter stay to the eventual return. This helps emergency planners and managers visualize routes, detect bottlenecks, and estimate resource needs to refine their disaster response.
 
 ## Recommended IDE Setup
 
