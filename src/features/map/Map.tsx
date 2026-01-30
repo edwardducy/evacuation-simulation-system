@@ -1,21 +1,27 @@
 import { useRef, useEffect } from "react";
 import maplibregl from "maplibre-gl";
+import osrmTextInstructions, { Compiler, CompileOptions, RouteStep } from "osrm-text-instructions";
+import { OSRMResponse, OSRMRoute } from "../../osrm";
 
 function Map() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<maplibregl.Map | null>(null);
   const markers = useRef<maplibregl.Marker[]>([]);
 
+  const compiler = osrmTextInstructions("v5");
+
   async function getRoute(start: [number, number], end: [number, number]) {
-  const url = `http://localhost:5000/route/v1/foot/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&overview=full`;
+  const url = `http://localhost:5000/route/v1/foot/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&overview=full&steps=true`;
   
   const res = await fetch (url);
-  const data = await res.json();
-  const coordinates = data.routes[0].geometry.coordinates;
+  const osrmData: OSRMResponse = await res.json();
+  const route: OSRMRoute = osrmData.routes[0];
+  const coordinates = osrmData.routes[0].geometry.coordinates;
 
 
   const source = mapInstance.current!.getSource("route") as maplibregl.GeoJSONSource;
 
+  
   source.setData({
     type: "Feature",
     properties: {},
@@ -24,6 +30,27 @@ function Map() {
       coordinates,
     },
   })
+
+  const instructions: string[] = [];
+  try {
+    route.legs.forEach((leg: any, legIndex: number) => {
+      leg.steps.forEach((step: RouteStep) => {
+        const options: CompileOptions = {
+          legCount: route.legs.length,
+          legIndex,
+          formatToken: (token, value) =>
+            token === "way_name" ? `<strong>${value}</strong>` : value,
+        };
+        const instruction = compiler.compile("en", step, options);
+        instructions.push(instruction);
+     });
+    });
+    console.log("Directions:", instructions);
+  } catch (err) {
+   console.error("Failed to generate OSRM instructions:", err);
+}
+
+
 }
 
   useEffect(() => {
@@ -38,7 +65,7 @@ function Map() {
 
       let points: [number, number][] = [];
 
-      mapInstance.current.on("click", async (e) => {  
+      mapInstance.current.on("click", (e) => {  
         const lngLat: [number, number] = [e.lngLat.lng, e.lngLat.lat];
         points.push(lngLat);
 
