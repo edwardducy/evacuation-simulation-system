@@ -22,7 +22,7 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "tiles": ["http://localhost:3000/philippines/{z}/{x}/{y}"],
+      "tiles": ["http://localhost:3000/output/{z}/{x}/{y}"],
       "minzoom": 0,
       "maxzoom": 14
     }

@@ -1,8 +1,12 @@
-import Map from "./features/map/Map.tsx";
+import OSM from "./Map-2.tsx";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 function App() {
-  return <div><Map /></div>
+  return (
+    <div>
+      <OSM />
+    </div>
+  );
 }
 
 export default App;
